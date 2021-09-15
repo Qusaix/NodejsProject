@@ -19,16 +19,8 @@ router.post('/',ArticleValdation , async (req,res)=>{
     //STEP 1 VALDATION
     if(checkErrors(req,res) !== true)res.send('Valdation Error');
     //STEP 2 ADD THE POST
-    const article = new Article({
-        title:req.body.name,
-        description:req.body.description
-    })
-    try {
-        await article.save();
-        res.redirect(`/articles/${article.slug}`);
-    } catch (error) {
-        console.log('saveing article error: ',error)
-    }
+    const article = new Article()
+    await savePost(req,res,article);
 })
 //Edit POST
 router.get('/edit/:slug', async (req,res)=>{
@@ -37,19 +29,12 @@ router.get('/edit/:slug', async (req,res)=>{
 });
 // UPDATE POST
 router.post('/update/:slug',ArticleValdation ,async (req,res)=>{
-    // valdation
+    // VALDATION
     if(checkErrors(req,res) !== true)res.send('Valdation Error');
     // FIND THE ARTICLE
     const article = await Article.findOne({slug:req.params.slug});
-    article.title = req.body.name;
-    article.description = req.body.description;
-    try{
-        await article.save()
-        res.redirect(`/articles/${article.slug}`)
-    }
-    catch(error){
-        cconsole.log('updateing article error: ',error);
-    }
+    await savePost(req,res,article);
+
 });
 
 // DELETE POST
@@ -57,7 +42,7 @@ router.delete('/delete/:id', async (req,res)=>{
     await Article.findByIdAndDelete(req.params.id);
     res.redirect('/');
 });
-
+//CHECK IF THERE IS ANY ERRORS IN THE VALDATION
 function checkErrors(req,res)
 {
     const errors = validationResult(req);
@@ -69,6 +54,15 @@ function checkErrors(req,res)
         return true;
     }
 
+}
+//SAVE THE POST IN ADDING AND UPDATEING THE POST
+function savePost(req,res,article)
+{
+    article.title = req.body.name;
+    article.description = req.body.description;
+    article.save()
+    res.redirect(`/articles/${article.slug}`)
+    
 }
 
 module.exports = router;
