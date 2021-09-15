@@ -6,12 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    <h3>
-        Hello World <%= name %>
-
-        <% articles.forEach(article => { %>
-            <h3> <%= article.title %> </h3>
-        <% }) %>    
-    </h3>
+    <form action="/articles/" method="post">
+        <%- include('_form') -%>
+    </form>
 </body>
 </html>

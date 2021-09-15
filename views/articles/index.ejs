@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h3>
+        Articles
+        <a href="/articles/add">
+            Add
+            </a>
+    </h3>
+        <ul>
+            <% articles.forEach(article => { %>
+                <li>
+                    <a href='/articles/<%= article.slug %>'> <%= article.title %></a>
+                    <a href="/articles/edit/<%=article.slug %>">Edit</a>
+                    <form action="/articles/delete/<%= article.id %>?_method=DELETE " method="POST">
+                        <button type="submit">Delete</button>
+                    </form>
+                </li>
+            <% }) %>    
+        
+        </ul>
+</body>
+</html>
