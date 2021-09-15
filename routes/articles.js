@@ -1,4 +1,6 @@
 const express = require('express');
+const { validationResult } = require('express-validator');
+const  { ArticleValdation }  = require('../RequestValdation/AddArticleValdation');
 const Article = require('../models/article');
 const router =  express.Router();
 
@@ -13,9 +15,9 @@ router.get('/:slug', async (req,res)=>{
     res.render('articles/show',{article});
 });
 //ADD POST
-router.post('/', async (req,res)=>{
+router.post('/',ArticleValdation , async (req,res)=>{
     //STEP 1 VALDATION
-
+    if(checkErrors(req,res) !== true)res.send('Valdation Error');
     //STEP 2 ADD THE POST
     const article = new Article({
         title:req.body.name,
@@ -28,13 +30,15 @@ router.post('/', async (req,res)=>{
         console.log('saveing article error: ',error)
     }
 })
-//Edit
+//Edit POST
 router.get('/edit/:slug', async (req,res)=>{
     const article = await Article.findOne({slug:req.params.slug});
     res.render('articles/edit',{article})
 });
 // UPDATE POST
-router.post('/update/:slug', async (req,res)=>{
+router.post('/update/:slug',ArticleValdation ,async (req,res)=>{
+    // valdation
+    if(checkErrors(req,res) !== true)res.send('Valdation Error');
     // FIND THE ARTICLE
     const article = await Article.findOne({slug:req.params.slug});
     article.title = req.body.name;
@@ -48,8 +52,23 @@ router.post('/update/:slug', async (req,res)=>{
     }
 });
 
+// DELETE POST
 router.delete('/delete/:id', async (req,res)=>{
     await Article.findByIdAndDelete(req.params.id);
     res.redirect('/');
 });
+
+function checkErrors(req,res)
+{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    else
+    {
+        return true;
+    }
+
+}
+
 module.exports = router;
